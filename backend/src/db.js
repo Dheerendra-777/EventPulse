@@ -26,28 +26,32 @@ CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, act
 const roleInsert = db.prepare('INSERT OR IGNORE INTO roles (name) VALUES (?)')
 ;['Admin', 'Organizer', 'Mentor', 'Participant'].forEach((role) => roleInsert.run(role))
 
-const seedUsers = [
-  ['Avery Morgan', 'admin@eventpulse.demo', 'admin123', 'Admin'],
-  ['Alex Rivera', 'organizer@eventpulse.demo', 'organizer123', 'Organizer'],
-  ['Maya Chen', 'mentor@eventpulse.demo', 'mentor123', 'Mentor'],
-  ['Jordan Lee', 'participant@eventpulse.demo', 'participant123', 'Participant'],
-]
-const userInsert = db.prepare('INSERT OR IGNORE INTO users (name, email, password_hash) VALUES (?, ?, ?)')
-const roleId = db.prepare('SELECT id FROM roles WHERE name = ?')
-const userId = db.prepare('SELECT id FROM users WHERE email = ?')
-const roleLink = db.prepare('INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)')
-seedUsers.forEach(([name, email, password, role]) => { userInsert.run(name, email, bcrypt.hashSync(password, 12)); roleLink.run(userId.get(email).id, roleId.get(role).id) })
+const shouldSeedDemoData = process.env.SEED_DEMO_DATA === 'true' || process.env.NODE_ENV !== 'production'
 
-const eventInsert = db.prepare('INSERT OR IGNORE INTO events (id, name, date, status, organization, created_by) VALUES (?, ?, ?, ?, ?, ?)')
-eventInsert.run(1, 'Future of Work Summit', '2026-09-18', 'Live', 'Northstar Events', userId.get('organizer@eventpulse.demo').id)
-eventInsert.run(2, 'Design Systems Day', '2026-10-04', 'Upcoming', 'Gatherly Collective', userId.get('organizer@eventpulse.demo').id)
-eventInsert.run(3, 'Climate Tech Forum', '2026-11-12', 'Draft', 'Northstar Events', userId.get('organizer@eventpulse.demo').id)
-const eventId = db.prepare('SELECT id FROM events WHERE name=?')
-const participantLink = db.prepare('INSERT OR IGNORE INTO event_participants (user_id,event_id,mentor_id,registration_date,status) VALUES (?,?,?,?,?)')
-participantLink.run(userId.get('participant@eventpulse.demo').id, eventId.get('Future of Work Summit').id, userId.get('mentor@eventpulse.demo').id, '2026-08-02', 'Active')
-const organizerLink = db.prepare('INSERT OR IGNORE INTO event_organizers (user_id,event_id,organization,status) VALUES (?,?,?,?)')
-organizerLink.run(userId.get('organizer@eventpulse.demo').id, eventId.get('Future of Work Summit').id, 'Northstar Events', 'Active')
-const mentorLink = db.prepare('INSERT OR IGNORE INTO event_mentors (user_id,event_id,status) VALUES (?,?,?)')
-mentorLink.run(userId.get('mentor@eventpulse.demo').id, eventId.get('Future of Work Summit').id, 'Active')
+if (shouldSeedDemoData) {
+  const seedUsers = [
+    ['Avery Morgan', 'admin@eventpulse.demo', 'admin123', 'Admin'],
+    ['Alex Rivera', 'organizer@eventpulse.demo', 'organizer123', 'Organizer'],
+    ['Maya Chen', 'mentor@eventpulse.demo', 'mentor123', 'Mentor'],
+    ['Jordan Lee', 'participant@eventpulse.demo', 'participant123', 'Participant'],
+  ]
+  const userInsert = db.prepare('INSERT OR IGNORE INTO users (name, email, password_hash) VALUES (?, ?, ?)')
+  const roleId = db.prepare('SELECT id FROM roles WHERE name = ?')
+  const userId = db.prepare('SELECT id FROM users WHERE email = ?')
+  const roleLink = db.prepare('INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)')
+  seedUsers.forEach(([name, email, password, role]) => { userInsert.run(name, email, bcrypt.hashSync(password, 12)); roleLink.run(userId.get(email).id, roleId.get(role).id) })
+
+  const eventInsert = db.prepare('INSERT OR IGNORE INTO events (id, name, date, status, organization, created_by) VALUES (?, ?, ?, ?, ?, ?)')
+  eventInsert.run(1, 'Future of Work Summit', '2026-09-18', 'Live', 'Northstar Events', userId.get('organizer@eventpulse.demo').id)
+  eventInsert.run(2, 'Design Systems Day', '2026-10-04', 'Upcoming', 'Gatherly Collective', userId.get('organizer@eventpulse.demo').id)
+  eventInsert.run(3, 'Climate Tech Forum', '2026-11-12', 'Draft', 'Northstar Events', userId.get('organizer@eventpulse.demo').id)
+  const eventId = db.prepare('SELECT id FROM events WHERE name=?')
+  const participantLink = db.prepare('INSERT OR IGNORE INTO event_participants (user_id,event_id,mentor_id,registration_date,status) VALUES (?,?,?,?,?)')
+  participantLink.run(userId.get('participant@eventpulse.demo').id, eventId.get('Future of Work Summit').id, userId.get('mentor@eventpulse.demo').id, '2026-08-02', 'Active')
+  const organizerLink = db.prepare('INSERT OR IGNORE INTO event_organizers (user_id,event_id,organization,status) VALUES (?,?,?,?)')
+  organizerLink.run(userId.get('organizer@eventpulse.demo').id, eventId.get('Future of Work Summit').id, 'Northstar Events', 'Active')
+  const mentorLink = db.prepare('INSERT OR IGNORE INTO event_mentors (user_id,event_id,status) VALUES (?,?,?)')
+  mentorLink.run(userId.get('mentor@eventpulse.demo').id, eventId.get('Future of Work Summit').id, 'Active')
+}
 
 module.exports = db
