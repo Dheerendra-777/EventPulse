@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: eventpulse
+    runtime: node
+    plan: free
+    buildCommand: npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend
+    startCommand: npm start --prefix backend
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SEED_DEMO_DATA
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGINS
+        fromService:
+          type: web
+          name: eventpulse
+          envVarKey: RENDER_EXTERNAL_URL
