@@ -18,8 +18,8 @@ import {
 } from './api.js'
 
 const navItems = [
-  ['overview', 'Overview', 'âŒ‚'], ['participants', 'Participants', 'â—Œ'], ['organizers', 'Organizers', 'â–¦'], ['mentors', 'Mentors', 'â™§'],
-  ['events', 'Events', 'â—«'], ['announcements', 'Announcements', 'â—ˆ'], ['reports', 'Reports', 'â–¥'], ['settings', 'Settings', 'âš™'],
+  ['overview', 'Overview', '⌂‚'], ['participants', 'Participants', '○'], ['organizers', 'Organizers', '◆'], ['mentors', 'Mentors', '♧'],
+  ['events', 'Events', '◌'], ['announcements', 'Announcements', '◇'], ['reports', 'Reports', '▣'], ['settings', 'Settings', '⚙'],
 ]
 
 function AdminDashboard({ session, onLogout }) {
