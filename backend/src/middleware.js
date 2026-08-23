@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken')
 const { z } = require('zod')
 
-const secret = process.env.JWT_SECRET || 'eventpulse-development-secret-change-me'
+const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? null : 'eventpulse-development-secret-change-me')
+if (!secret) throw new Error('JWT_SECRET must be configured when NODE_ENV=production.')
 
 function authRequired(req, res, next) {
   const token = req.headers.authorization?.replace(/^Bearer\s+/i, '')
